@@ -1,0 +1,39 @@
+name: Build JARVIS APK
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract JARVIS ZIP
+        run: |
+          mkdir -p extracted
+          unzip -o JARVIS_V1_Android_Project_Jarvis.zip -d extracted
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build JARVIS APK
+        working-directory: extracted/JARVIS_V1_Android_Project/JARVIS_V1
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload JARVIS APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: JARVIS-APK
+          path: extracted/JARVIS_V1_Android_Project/JARVIS_V1/app/build/outputs/apk/debug/*.apk
